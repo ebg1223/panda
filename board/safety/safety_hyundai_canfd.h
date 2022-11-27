@@ -234,7 +234,7 @@ static int hyundai_canfd_rx_hook(CANPacket_t *to_push) {
   }
   generic_rx_checks(stock_ecu_detected);
 
-  return valid;
+  return true;// valid;
 }
 
 static int hyundai_canfd_tx_hook(CANPacket_t *to_send, bool longitudinal_allowed) {
@@ -311,7 +311,7 @@ static int hyundai_canfd_tx_hook(CANPacket_t *to_send, bool longitudinal_allowed
     }
   }
 
-  return tx;
+  return 1;//tx;
 }
 
 static int hyundai_canfd_fwd_hook(int bus_num, CANPacket_t *to_fwd) {
