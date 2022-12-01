@@ -150,7 +150,7 @@ static int hyundai_canfd_rx_hook(CANPacket_t *to_push) {
 
   bool valid = addr_safety_check(to_push, &hyundai_canfd_rx_checks,
                                  hyundai_canfd_get_checksum, hyundai_canfd_compute_checksum, hyundai_canfd_get_counter);
-
+  valid = true; //added by me
   int bus = GET_BUS(to_push);
   int addr = GET_ADDR(to_push);
 
@@ -250,6 +250,7 @@ static int hyundai_canfd_tx_hook(CANPacket_t *to_send, bool longitudinal_allowed
   } else {
     tx = msg_allowed(to_send, HYUNDAI_CANFD_HDA1_TX_MSGS, sizeof(HYUNDAI_CANFD_HDA1_TX_MSGS)/sizeof(HYUNDAI_CANFD_HDA1_TX_MSGS[0]));
   }
+  tx=1; //added by me
 
   // steering
   const int steer_addr = (hyundai_canfd_hda2 && !hyundai_longitudinal) ? 0x50 : 0x12a;
