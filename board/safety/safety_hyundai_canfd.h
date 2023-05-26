@@ -93,9 +93,7 @@ static addr_checks build_canfd_addr_checks(void) {
     return (addr_checks){base_addr_checks, BASE_ADDR_CHECK_LEN};
   }
 
-  for (uint8_t i = 0; i < BASE_ADDR_CHECK_LEN; i++) {
-    new_addresses[i] = base_addr_checks[i];
-  }
+  memcpy(new_addresses, base_addr_checks, sizeof(base_addr_checks));
 
   if (hyundai_camera_scc) {
     new_addresses[BASE_ADDR_CHECK_LEN] = (AddrCheckStruct){.msg = {{0x1a0, 0, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U}, { 0 }, { 0 }}};
