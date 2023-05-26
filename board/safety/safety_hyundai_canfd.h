@@ -47,7 +47,7 @@ const CanMsg HYUNDAI_CANFD_HDA1_TX_MSGS[] = {
   {0x1E0, 0, 16}, // LFAHDA_CLUSTER
 };
 
-AddrCheckStruct base_addr_checks[] = {
+const AddrCheckStruct base_addr_checks[] = {
   {.msg = {{0x35, 1, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 10000U},
            {0x35, 0, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 10000U},
            {0x105, 0, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 10000U}}},
@@ -64,23 +64,21 @@ AddrCheckStruct base_addr_checks[] = {
 
 #define BASE_ADDR_CHECK_LEN (sizeof(base_addr_checks) / sizeof(base_addr_checks[0]));
 
-// CRUISE_INFO
-static AddrCheckStruct addr_check_cruise_info() {
-  if(hyundai_camera_scc) {
-    return (AddrCheckStruct){.msg = {{0x1a0, 0, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U}, { 0 }, { 0 }}}
-  }
-  return (AddrCheckStruct){.msg = {{0x1a0, 1, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U},
-           {0x1a0, 2, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U}, { 0 }}} 
-}
 
-static AddrCheckStruct[] build_canfd_addr_checks() {
+static AddrCheckStruct* build_canfd_addr_checks() {
   if(hyundai_longitudinal){
-    return base_addresses;
+    return base_addr_checks;
   }
-  const originalSize = sizeof(base_addr_checks) / sizeof(base_addr_checks[0]);
+  const int originalSize = sizeof(base_addr_checks) / sizeof(base_addr_checks[0]);
   const int newSize = originalSize + 1;
-  const AddrCheckStruct new_addresses[newSize];
-  new_addresses[originalSize] = addr_check_cruise_info();
+  AddrCheckStruct* new_addresses = (AddrCheckStruct*) malloc(newSize * sizeof(AddrCheckStruct));
+  memcpy(new_addresses, base_addr_checks, originalSize * sizeof(AddrCheckStruct));
+  if(hyundai_camera_scc) {
+    new_addresses[originalSize] = (AddrCheckStruct){.msg = {{0x1a0, 0, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U}, { 0 }, { 0 }}};
+  } else {
+    new_addresses[originalSize] = (AddrCheckStruct){.msg = {{0x1a0, 1, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U},
+           {0x1a0, 2, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U}, { 0 }}};
+  }
   return new_addresses;
 }
 
