@@ -67,10 +67,10 @@ const AddrCheckStruct base_addr_checks[] = {
 // CRUISE_INFO
 static AddrCheckStruct addr_check_cruise_info() {
   if(hyundai_camera_scc) {
-    return (AddrCheckStruct){.msg = {{0x1a0, 0, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U}, { 0 }, { 0 }}}
+    return (AddrCheckStruct){.msg = {{0x1a0, 0, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U}, { 0 }, { 0 }}};
   }
   return (AddrCheckStruct){.msg = {{0x1a0, 1, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U},
-           {0x1a0, 2, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U}, { 0 }}} 
+           {0x1a0, 2, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U}, { 0 }}};
 }
 
 static AddrCheckStruct* build_canfd_addr_checks() {
