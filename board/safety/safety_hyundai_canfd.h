@@ -95,18 +95,14 @@ static AddrCheckStruct get_cruise_info_check(void){
   } 
 }
 
-static addr_checks build_canfd_addr_checks(void) {
-  AddrCheckStruct new_addresses[BASE_ADDR_CHECK_LEN + 1];
-  
+static addr_checks build_canfd_addr_checks(void) {  
   if(hyundai_longitudinal) {
     return (addr_checks){base_addr_checks, BASE_ADDR_CHECK_LEN};
   }
-
+  AddrCheckStruct new_addresses[BASE_ADDR_CHECK_LEN + 1];
   memcpy(new_addresses, base_addr_checks, sizeof(base_addr_checks));
-  
   AddrCheckStruct cruise_info_check = get_cruise_info_check();
   memcpy(&new_addresses[BASE_ADDR_CHECK_LEN], &cruise_info_check, sizeof(AddrCheckStruct));
-
   return (addr_checks){new_addresses, BASE_ADDR_CHECK_LEN + 1};
 }
 
