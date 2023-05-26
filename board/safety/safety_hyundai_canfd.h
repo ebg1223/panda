@@ -86,6 +86,15 @@ bool hyundai_canfd_hda2 = false;
 bool hyundai_canfd_alt_buttons = false;
 
 
+static AddrCheckStruct get_cruise_info_check(void){
+    if (hyundai_camera_scc) {
+   return (AddrCheckStruct){.msg = {{0x1a0, 0, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U}, { 0 }, { 0 }}};
+  } else {
+    return (AddrCheckStruct){.msg = {{0x1a0, 1, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U},
+          {0x1a0, 2, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U}, { 0 }}};
+  } 
+}
+
 static addr_checks build_canfd_addr_checks(void) {
   AddrCheckStruct new_addresses[BASE_ADDR_CHECK_LEN + 1];
   
@@ -94,13 +103,10 @@ static addr_checks build_canfd_addr_checks(void) {
   }
 
   memcpy(new_addresses, base_addr_checks, sizeof(base_addr_checks));
+  
+  AddrCheckStruct cruise_info_check = get_cruise_info_check();
+  memcpy(&new_addresses[BASE_ADDR_CHECK_LEN], &cruise_info_check, sizeof(AddrCheckStruct);
 
-  if (hyundai_camera_scc) {
-    new_addresses[BASE_ADDR_CHECK_LEN] = (AddrCheckStruct){.msg = {{0x1a0, 0, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U}, { 0 }, { 0 }}};
-  } else {
-    new_addresses[BASE_ADDR_CHECK_LEN] = (AddrCheckStruct){.msg = {{0x1a0, 1, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U},
-          {0x1a0, 2, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U}, { 0 }}};
-  }
   return (addr_checks){new_addresses, BASE_ADDR_CHECK_LEN + 1};
 }
 
