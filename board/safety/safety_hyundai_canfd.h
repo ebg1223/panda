@@ -64,23 +64,6 @@ AddrCheckStruct base_addr_checks[] = {
 
 #define BASE_ADDR_CHECK_LEN (sizeof(base_addr_checks) / sizeof(base_addr_checks[0]))
 
-static addr_checks build_canfd_addr_checks() {
-  if(hyundai_longitudinal) {
-    return (addr_checks){base_addr_checks, BASE_ADDR_CHECK_LEN};
-  }
-  const int originalSize = sizeof(base_addr_checks) / sizeof(base_addr_checks[0]);
-  AddrCheckStruct new_addresses[sizeof(base_addr_checks) / sizeof(AddrCheckStruct) + 1];
-  memcpy(new_addresses, base_addr_checks, sizeof(base_addr_checks));
-  if (hyundai_camera_scc) {
-    new_addresses[sizeof(base_addr_checks) / sizeof(AddrCheckStruct)] = (AddrCheckStruct){.msg = {{0x1a0, 0, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U}, { 0 }, { 0 }}};
-  } else {
-    new_addresses[sizeof(base_addr_checks) / sizeof(AddrCheckStruct)] = (AddrCheckStruct){.msg = {{0x1a0, 1, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U},
-          {0x1a0, 2, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U}, { 0 }}};
-  }
-
-  return (addr_checks){new_addresses, BASE_ADDR_CHECK_LEN + 1};
-}
-
 AddrCheckStruct hyundai_canfd_ice_addr_checks[] = {
   {.msg = {{0x100, 0, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 10000U}, { 0 }, { 0 }}},
   {.msg = {{0xa0, 0, 24, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 10000U}, { 0 }, { 0 }}},
@@ -91,7 +74,7 @@ AddrCheckStruct hyundai_canfd_ice_addr_checks[] = {
 
 #define HYUNDAI_CANFD_ICE_ADDR_CHECK_LEN (sizeof(hyundai_canfd_ice_addr_checks) / sizeof(hyundai_canfd_ice_addr_checks[0]))
 
-addr_checks hyundai_canfd_rx_checks = ({base_addr_checks, BASE_ADDR_CHECK_LEN});
+addr_checks hyundai_canfd_rx_checks = {base_addr_checks, BASE_ADDR_CHECK_LEN};
 
 
 uint16_t hyundai_canfd_crc_lut[256];
@@ -102,6 +85,21 @@ const int HYUNDAI_PARAM_CANFD_ALT_BUTTONS = 32;
 bool hyundai_canfd_hda2 = false;
 bool hyundai_canfd_alt_buttons = false;
 
+
+static addr_checks build_canfd_addr_checks() {
+  if(hyundai_longitudinal) {
+    return (addr_checks){base_addr_checks, BASE_ADDR_CHECK_LEN};
+  }
+  AddrCheckStruct new_addresses[BASE_ADDR_CHECK_LEN + 1];
+  memcpy(new_addresses, base_addr_checks, sizeof(base_addr_checks));
+  if (hyundai_camera_scc) {
+    new_addresses[sizeof(base_addr_checks) / sizeof(AddrCheckStruct)] = (AddrCheckStruct){.msg = {{0x1a0, 0, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U}, { 0 }, { 0 }}};
+  } else {
+    new_addresses[sizeof(base_addr_checks) / sizeof(AddrCheckStruct)] = (AddrCheckStruct){.msg = {{0x1a0, 1, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U},
+          {0x1a0, 2, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U}, { 0 }}};
+  }
+  return (addr_checks){new_addresses, BASE_ADDR_CHECK_LEN + 1};
+}
 
 static uint8_t hyundai_canfd_get_counter(CANPacket_t *to_push) {
   uint8_t ret = 0;
