@@ -86,7 +86,7 @@ bool hyundai_canfd_hda2 = false;
 bool hyundai_canfd_alt_buttons = false;
 
 
-static const addr_checks build_canfd_addr_checks(void) {
+static addr_checks build_canfd_addr_checks(void) {
   AddrCheckStruct new_addresses[BASE_ADDR_CHECK_LEN + 1];
   
   if(hyundai_longitudinal) {
