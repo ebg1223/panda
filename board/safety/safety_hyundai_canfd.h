@@ -87,7 +87,7 @@ bool hyundai_canfd_alt_buttons = false;
 
 
 static addr_checks build_canfd_addr_checks(void) {
-  AddrCheckStruct new_addresses[BASE_ADDR_CHECK_LEN + 1];
+  const AddrCheckStruct new_addresses[BASE_ADDR_CHECK_LEN + 1] = {0};
   
   if(hyundai_longitudinal) {
     return (addr_checks){base_addr_checks, BASE_ADDR_CHECK_LEN};
@@ -97,7 +97,7 @@ static addr_checks build_canfd_addr_checks(void) {
   if (hyundai_camera_scc) {
     new_addresses[BASE_ADDR_CHECK_LEN] = (AddrCheckStruct){.msg = {{0x1a0, 0, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U}, { 0 }, { 0 }}};
   } else {
-    new_addresses[sizeof(base_addr_checks) / sizeof(AddrCheckStruct)] = (AddrCheckStruct){.msg = {{0x1a0, 1, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U},
+    new_addresses[BASE_ADDR_CHECK_LEN] = (AddrCheckStruct){.msg = {{0x1a0, 1, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U},
           {0x1a0, 2, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U}, { 0 }}};
   }
   return (addr_checks){new_addresses, BASE_ADDR_CHECK_LEN + 1};
