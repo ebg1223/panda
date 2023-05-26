@@ -79,14 +79,15 @@ static AddrCheckStruct* build_canfd_addr_checks() {
   }
   const int originalSize = sizeof(base_addr_checks) / sizeof(base_addr_checks[0]);
   const int newSize = originalSize + 1;
-  AddrCheckStruct* new_addresses = (AddrCheckStruct*) malloc(newSize * sizeof(AddrCheckStruct));
-  memcpy(new_addresses, base_addr_checks, originalSize * sizeof(AddrCheckStruct));
-  if(hyundai_camera_scc) {
-    new_addresses[originalSize] = (AddrCheckStruct){.msg = {{0x1a0, 0, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U}, { 0 }, { 0 }}};
+  static AddrCheckStruct new_addresses[sizeof(base_addr_checks) / sizeof(AddrCheckStruct) + 1];
+  memcpy(new_addresses, base_addr_checks, sizeof(base_addr_checks));
+  if (hyundai_camera_scc) {
+    new_addresses[sizeof(base_addr_checks) / sizeof(AddrCheckStruct)] = (AddrCheckStruct){.msg = {{0x1a0, 0, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U}, { 0 }, { 0 }}};
   } else {
-    new_addresses[originalSize] = (AddrCheckStruct){.msg = {{0x1a0, 1, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U},
-           {0x1a0, 2, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U}, { 0 }}};
+    new_addresses[sizeof(base_addr_checks) / sizeof(AddrCheckStruct)] = (AddrCheckStruct){.msg = {{0x1a0, 1, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U},
+          {0x1a0, 2, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U}, { 0 }}};
   }
+
   return new_addresses;
 }
 
