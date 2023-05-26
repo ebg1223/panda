@@ -87,13 +87,16 @@ bool hyundai_canfd_alt_buttons = false;
 
 
 static addr_checks build_canfd_addr_checks(void) {
-  const AddrCheckStruct new_addresses[BASE_ADDR_CHECK_LEN + 1] = {0};
+  AddrCheckStruct new_addresses[BASE_ADDR_CHECK_LEN + 1];
   
   if(hyundai_longitudinal) {
     return (addr_checks){base_addr_checks, BASE_ADDR_CHECK_LEN};
   }
 
-  memcpy(new_addresses, base_addr_checks, sizeof(base_addr_checks));
+  for (int i = 0; i < BASE_ADDR_CHECK_LEN; i++) {
+    new_addresses[i] = base_addr_checks[i];
+  }
+  
   if (hyundai_camera_scc) {
     new_addresses[BASE_ADDR_CHECK_LEN] = (AddrCheckStruct){.msg = {{0x1a0, 0, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U}, { 0 }, { 0 }}};
   } else {
