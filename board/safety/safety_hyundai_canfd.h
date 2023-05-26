@@ -64,6 +64,14 @@ const AddrCheckStruct base_addr_checks[] = {
 
 #define BASE_ADDR_CHECK_LEN (sizeof(base_addr_checks) / sizeof(base_addr_checks[0]));
 
+// CRUISE_INFO
+static AddrCheckStruct addr_check_cruise_info() {
+  if(hyundai_camera_scc) {
+    return (AddrCheckStruct){.msg = {{0x1a0, 0, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U}, { 0 }, { 0 }}}
+  }
+  return (AddrCheckStruct){.msg = {{0x1a0, 1, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U},
+           {0x1a0, 2, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U}, { 0 }}} 
+}
 
 static AddrCheckStruct* build_canfd_addr_checks() {
   if(hyundai_longitudinal){
@@ -336,7 +344,7 @@ static const addr_checks* hyundai_canfd_init(uint16_t param) {
   if (!hyundai_longitudinal && !hyundai_ev_gas_signal && !hyundai_hybrid_gas_signal) {
     hyundai_canfd_rx_checks = (addr_checks){hyundai_canfd_ice_addr_checks, HYUNDAI_CANFD_ICE_ADDR_CHECK_LEN};
   } else {
-    const AddrCheckStruct[] addrchecks = build_canfd_addr_checks();
+    const AddrCheckStruct addrchecks[] = build_canfd_addr_checks();
     hyundai_canfd_rx_checks = (addr_checks){addrchecks,(sizeof(addrchecks) / sizeof(addrchecks[0]))};
   }
 
