@@ -62,24 +62,14 @@ const AddrCheckStruct base_addr_checks[] = {
            {0x1aa, 0, 16, .check_checksum = false, .max_counter = 0xffU, .expected_timestep = 20000U}}}
 };
 
-#define BASE_ADDR_CHECK_LEN (sizeof(base_addr_checks) / sizeof(base_addr_checks[0]));
+#define BASE_ADDR_CHECK_LEN (sizeof(base_addr_checks) / sizeof(base_addr_checks[0]))
 
-// CRUISE_INFO
-static AddrCheckStruct addr_check_cruise_info() {
-  if(hyundai_camera_scc) {
-    return (AddrCheckStruct){.msg = {{0x1a0, 0, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U}, { 0 }, { 0 }}};
-  }
-  return (AddrCheckStruct){.msg = {{0x1a0, 1, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U},
-           {0x1a0, 2, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U}, { 0 }}};
-}
-
-static AddrCheckStruct* build_canfd_addr_checks() {
-  if(hyundai_longitudinal){
-    return base_addr_checks;
+static addr_checks build_canfd_addr_checks() {
+  if(hyundai_longitudinal) {
+    return ({base_addr_checks, BASE_ADDR_CHECK_LEN});
   }
   const int originalSize = sizeof(base_addr_checks) / sizeof(base_addr_checks[0]);
-  const int newSize = originalSize + 1;
-  static AddrCheckStruct new_addresses[sizeof(base_addr_checks) / sizeof(AddrCheckStruct) + 1];
+  AddrCheckStruct new_addresses[sizeof(base_addr_checks) / sizeof(AddrCheckStruct) + 1];
   memcpy(new_addresses, base_addr_checks, sizeof(base_addr_checks));
   if (hyundai_camera_scc) {
     new_addresses[sizeof(base_addr_checks) / sizeof(AddrCheckStruct)] = (AddrCheckStruct){.msg = {{0x1a0, 0, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U}, { 0 }, { 0 }}};
@@ -88,7 +78,7 @@ static AddrCheckStruct* build_canfd_addr_checks() {
           {0x1a0, 2, 32, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U}, { 0 }}};
   }
 
-  return new_addresses;
+  return ({new_addresses, BASE_ADDR_CHECK_LEN + 1});
 }
 
 AddrCheckStruct hyundai_canfd_ice_addr_checks[] = {
@@ -98,9 +88,10 @@ AddrCheckStruct hyundai_canfd_ice_addr_checks[] = {
   {.msg = {{0x175, 0, 24, .check_checksum = true, .max_counter = 0xffU, .expected_timestep = 20000U}, { 0 }, { 0 }}},
   {.msg = {{0x1aa, 0, 16, .check_checksum = false, .max_counter = 0xffU, .expected_timestep = 20000U}, { 0 }, { 0 }}},
 };
+
 #define HYUNDAI_CANFD_ICE_ADDR_CHECK_LEN (sizeof(hyundai_canfd_ice_addr_checks) / sizeof(hyundai_canfd_ice_addr_checks[0]))
 
-addr_checks hyundai_canfd_rx_checks = {base_addr_checks, BASE_ADDR_CHECK_LEN};
+addr_checks hyundai_canfd_rx_checks = ({base_addr_checks, BASE_ADDR_CHECK_LEN});
 
 
 uint16_t hyundai_canfd_crc_lut[256];
@@ -345,8 +336,7 @@ static const addr_checks* hyundai_canfd_init(uint16_t param) {
   if (!hyundai_longitudinal && !hyundai_ev_gas_signal && !hyundai_hybrid_gas_signal) {
     hyundai_canfd_rx_checks = (addr_checks){hyundai_canfd_ice_addr_checks, HYUNDAI_CANFD_ICE_ADDR_CHECK_LEN};
   } else {
-    const AddrCheckStruct addrchecks[] = build_canfd_addr_checks();
-    hyundai_canfd_rx_checks = (addr_checks){addrchecks,(sizeof(addrchecks) / sizeof(addrchecks[0]))};
+      return build_canfd_addr_checks();
   }
 
   return &hyundai_canfd_rx_checks;
